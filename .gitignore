@@ -2,3 +2,4 @@ cache
 venv
 *.json
 *.geojson
+.DS_Store
