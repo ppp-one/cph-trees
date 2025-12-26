@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copenhagen Tree Density</title>
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link
+      href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="loading-indicator" style="display: none">Loading tiles...</div>
+
+    <!-- Basemap switcher in top right -->
+    <div id="basemap-switcher">
+      <button id="basemap-toggle" title="Change map style">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          style="margin: auto; display: block; width: 24px; height: 24px"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"
+          />
+        </svg>
+      </button>
+      <button
+        id="info-button"
+        title="About this map"
+        aria-label="About this map"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          style="margin: auto; display: block; width: 20px; height: 20px"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 10v6" />
+          <path d="M12 7h.01" />
+        </svg>
+      </button>
+      <div id="basemap-menu" style="display: none">
+        <button data-style="carto-light">Default</button>
+        <button data-style="satellite">Satellite</button>
+      </div>
+    </div>
+
+    <div id="controls">
+      <button id="controls-toggle" aria-label="Toggle controls">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="4" y1="6" x2="20" y2="6"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="18" x2="20" y2="18"></line>
+      </svg>
+      </button>
+      <div id="controls-content">
+      <div class="control-group">
+        <label for="surface-filter">Filter by Surface</label>
+        <select id="surface-filter">
+        <option value="all">All Surfaces</option>
+        </select>
+      </div>
+      <div class="control-group checkbox-group">
+        <input type="checkbox" id="toggle-trees" />
+        <label for="toggle-trees">Show individual trees</label>
+      </div>
+      <div class="legend">
+        <h4>Trees per 100m</h4>
+        <div class="legend-items">
+        <div class="legend-item">
+          <span class="color-box" style="background-color: #cccccc"></span>
+          <span class="legend-label">0</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-box" style="background-color: #e5f5e0"></span>
+          <span class="legend-label">0.1 - 2</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-box" style="background-color: #a1d99b"></span>
+          <span class="legend-label">2 - 5</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-box" style="background-color: #41ab5d"></span>
+          <span class="legend-label">5 - 10</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-box" style="background-color: #006d2c"></span>
+          <span class="legend-label">> 10</span>
+        </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Info modal (shown on open; can be reopened via info button) -->
+    <div
+      id="info-modal"
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="info-modal-title"
+      style="display: none"
+    >
+      <div class="modal" role="document">
+        <button id="info-modal-close" class="modal-close" aria-label="Close">
+          <span>&times;</span>
+        </button>
+        <h1>Copenhagen Trees 🌳</h1>
+        <h2 id="info-modal-title">About this map</h2>
+        <p>
+          This map highlights Copenhagen streets by tree density (trees per
+          100m) to help you find greener routes and see where street-tree
+          coverage varies across the city.
+        </p>
+        <p>
+          Street trees also relate to happiness and mental wellbeing: studies
+          have found that areas with higher street-tree density are associated
+          with better mental-health indicators and improved self-reported
+          health.
+        </p>
+        <p>
+          They can also improve thermal comfort by providing shade and cooling
+          at street level.
+        </p>
+
+        <h3>How to use</h3>
+        <ul>
+          <li>
+            Color shows tree density (trees per 100m) for each street segment.
+          </li>
+          <li>Click a street to see counts and open Street View.</li>
+          <li>Use the surface filter to compare street types.</li>
+          <li>Toggle “Show Trees” to view individual tree points.</li>
+        </ul>
+
+        <h3>Note</h3>
+        <p>
+          While the tree data is fairly comprehensive, some trees may be missing
+          or misclassified.
+        </p>
+
+        <h3>Sources</h3>
+        <ul class="sources">
+          <li>
+            <a
+              href="https://www.nature.com/articles/s41598-020-79924-5"
+              target="_blank"
+              rel="noopener"
+            >
+              Marselle et al. (2020) — Street-tree density & antidepressant
+              prescriptions (Leipzig)
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://environment.ec.europa.eu/news/effectiveness-urban-tree-planting-city-cooling-varies-between-european-regions-2023-07-27_en"
+              target="_blank"
+              rel="noopener"
+            >
+              European Commission — Urban trees and city cooling (shade,
+              canopy/leaf density)
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://urbandevelopmentcph.kk.dk/urban-planning/urban-nature"
+              target="_blank"
+              rel="noopener"
+            >
+              Copenhagen Municipality — Urban nature in Copenhagen
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.openstreetmap.org/"
+              target="_blank"
+              rel="noopener"
+            >
+              OpenStreetMap — Street and tree data
+            </a>
+          </li>
+        </ul>
+
+        <div style="text-align: center">
+          <p style="font-size: 12px; color: #666; margin: 32px auto 0 auto">
+            Made with ❤️ by
+            <a
+              href="https://www.ppp.one/"
+              style="text-decoration-line: underline"
+              >Peter Pihlmann Pedersen</a
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

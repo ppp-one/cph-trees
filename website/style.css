@@ -1,0 +1,376 @@
+body { margin: 0; padding: 0; font-family: sans-serif; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+#loading-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    z-index: 2;
+    font-size: 14px;
+}
+
+#basemap-switcher {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#basemap-toggle {
+    background: white;
+    border: none;
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    padding: 0;
+    color: #333;
+}
+
+#basemap-toggle:hover {
+    background: #f5f5f5;
+}
+
+#info-button {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #333;
+    transition: background 0.2s;
+}
+
+#info-button:hover {
+    background: #f5f5f5;
+}
+
+a {
+    color: #0b57d0;
+    text-decoration: none;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal {
+    background: white;
+    border-radius: 8px;
+    width: min(640px, 100%);
+    max-height: 85vh;
+    overflow: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    padding: 18px 18px 14px;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close span {
+    margin-top: -2px;
+}
+
+.modal-close:hover {
+    background: #e5e7eb;
+}
+
+.modal h1 {
+    margin: 0 44px 20px 0;
+    font-size: 24px;
+}
+
+.modal h2 {
+    margin: 0 44px 10px 0;
+    font-size: 18px;
+}
+
+.modal h3 {
+    margin: 14px 0 8px;
+    font-size: 14px;
+}
+
+.modal p {
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.modal ul {
+    margin: 8px 0 0 18px;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.modal ul li {
+    margin: 6px 0;
+}
+
+.modal .sources {
+    margin-left: 18px;
+}
+
+.modal a {
+    color: #0b57d0;
+    text-decoration: none;
+}
+
+.modal a:hover {
+    text-decoration: underline;
+}
+
+#basemap-menu {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+    min-width: 120px;
+}
+
+#basemap-menu button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+#basemap-menu button:hover {
+    background: #f5f5f5;
+}
+
+#basemap-menu button.active {
+    background: #e3f2fd;
+    font-weight: bold;
+}
+
+#controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1;
+    width: 250px;
+}
+
+h3 { margin-top: 0; }
+
+.control-group {
+    margin-bottom: 15px;
+}
+
+select {
+    width: 100%;
+    padding: 5px;
+}
+
+.legend {
+    margin-top: 10px;
+}
+
+.legend h4 {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+}
+
+/* Mobile controls toggle */
+#controls-toggle {
+    display: none;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 2;
+    padding: 0;
+    place-items: center;
+    line-height: 0;
+}
+
+#controls-toggle svg {
+    margin: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    #controls {
+        top: auto;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-height: 60vh;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    
+    #controls-toggle {
+        display: grid;
+    }
+    
+    #controls.collapsed #controls-content {
+        display: none;
+    }
+    
+    #controls.collapsed {
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        bottom: 20px;
+        left: 20px;
+        right: auto;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #controls.collapsed #controls-toggle {
+        position: static;
+        box-shadow: none;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        margin: 0;
+    }
+    
+    .control-group {
+        margin-bottom: 12px;
+    }
+    
+    select, input[type="checkbox"] {
+        min-height: 44px; /* Better touch target */
+    }
+    
+    select {
+        font-size: 16px; /* Prevent zoom on iOS */
+        padding: 10px;
+    }
+    
+    label {
+        font-size: 14px;
+    }
+    
+    .legend {
+        font-size: 12px;
+    }
+    
+    .legend h4 {
+        font-size: 13px;
+    }
+    
+    #basemap-switcher {
+        top: 20px;
+        right: 20px;
+    }
+    
+    #basemap-toggle {
+        width: 40px;
+        height: 40px;
+    }
+
+    #info-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    #basemap-menu button {
+        padding: 12px 15px;
+        font-size: 16px;
+    }
+    
+    #loading-indicator {
+        top: 20px;
+        right: 80px;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #controls {
+        padding: 8px;
+    }
+    
+    .legend-item {
+        font-size: 11px;
+    }
+    
+    .color-box {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+}
