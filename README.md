@@ -4,6 +4,9 @@ A visualization of street-tree density across Copenhagen, helping you find green
 
 **[Live Demo](https://cphtrees.netlify.app/)**
 
+<!-- screenshot.jpeg -->
+[![Copenhagen Tree Density Screenshot](screenshot.jpeg)](https://cphtrees.netlify.app/)
+
 ## Overview
 
 This project analyzes the density of street trees in Copenhagen by calculating the number of trees per 100 meters for each street segment. The data is sourced from OpenStreetMap and visualized using MapLibre GL JS.
